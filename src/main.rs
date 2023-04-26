@@ -6,7 +6,7 @@ use mailetter::{
     telemetry::{get_subscriber, init_subscriber},
 };
 use secrecy::ExposeSecret;
-use sqlx::{Connection, PgConnection, PgPool};
+use sqlx::{Connection, PgPool};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

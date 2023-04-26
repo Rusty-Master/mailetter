@@ -1,4 +1,4 @@
-use config::{Config, ConfigError};
+use config::{Config};
 use secrecy::{ExposeSecret, Secret};
 use serde::Deserialize;
 

@@ -1,12 +1,12 @@
 use std::net::TcpListener;
 
 use mailetter::{
-    configuration::{self, get_configuration, DatabaseSettings},
+    configuration::{get_configuration, DatabaseSettings},
     startup::run,
     telemetry::{get_subscriber, init_subscriber},
 };
 use once_cell::sync::Lazy;
-use reqwest::{Client, Request};
+
 use secrecy::ExposeSecret;
 use sqlx::{ConnectOptions, Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
