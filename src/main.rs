@@ -6,7 +6,7 @@ use mailetter::{
     telemetry::{get_subscriber, init_subscriber},
 };
 use secrecy::ExposeSecret;
-use sqlx::{Connection, PgPool};
+use sqlx::PgPool;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -17,7 +17,7 @@ async fn main() -> std::io::Result<()> {
     let address = format!("127.0.0.1:{}", configuration.application_port);
 
     let connection_pool =
-        PgPool::connect(&configuration.database.connection_string().expose_secret())
+        PgPool::connect(configuration.database.connection_string().expose_secret())
             .await
             .expect("Failed to connect to Postgres.");
 

@@ -8,7 +8,7 @@ use mailetter::{
 use once_cell::sync::Lazy;
 
 use secrecy::ExposeSecret;
-use sqlx::{ConnectOptions, Connection, Executor, PgConnection, PgPool};
+use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
 
 static TRACING: Lazy<()> = Lazy::new(|| {
@@ -41,7 +41,7 @@ async fn spawn_app() -> TestApp {
     let connection_pool = configure_database(&configuration.database).await;
 
     let server = run(listener, connection_pool.clone()).expect("Failed to bind address");
-    let _ = tokio::spawn(server);
+    tokio::spawn(server);
     TestApp {
         address,
         db_pool: connection_pool,
@@ -89,11 +89,11 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
     // Given
     let app = spawn_app().await;
     let client = reqwest::Client::new();
+    let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
 
     // When
-    let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
     let response = client
-        .get(&format!("{}/subscriptions", &app.address))
+        .post(&format!("{}/subscriptions", &app.address))
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body)
         .send()
@@ -127,7 +127,7 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
     for (invalid_body, error_message) in test_cases {
         // When
         let response = client
-            .get(&format!("{}/subscriptions", app.address))
+            .post(&format!("{}/subscriptions", app.address))
             .header("Content-Type", "application/x-www-form-urlencoded")
             .body(invalid_body)
             .send()
