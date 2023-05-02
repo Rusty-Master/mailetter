@@ -5,8 +5,8 @@ use mailetter::{
     startup::run,
     telemetry::{get_subscriber, init_subscriber},
 };
-use secrecy::ExposeSecret;
-use sqlx::{postgres::PgPoolOptions, PgPool};
+
+use sqlx::postgres::PgPoolOptions;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

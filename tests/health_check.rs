@@ -1,4 +1,4 @@
-use std::net::TcpListener;
+use std::{net::TcpListener, vec};
 
 use mailetter::{
     configuration::{get_configuration, DatabaseSettings},
@@ -7,7 +7,6 @@ use mailetter::{
 };
 use once_cell::sync::Lazy;
 
-use secrecy::ExposeSecret;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
 
@@ -57,7 +56,7 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .await
         .expect("Failed to create database.");
     // Migrate database
-    let connection_pool = PgPool::connect_with(config.without_db())
+    let connection_pool = PgPool::connect_with(config.with_db())
         .await
         .expect("Failed to connect to Postgres.");
     sqlx::migrate!("./migrations")
@@ -140,6 +139,37 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
             response.status().as_u16(),
             "The API did not fail with 400 Bad Request whe the payloda was {}.",
             error_message
+        )
+    }
+}
+
+#[actix_web::test]
+async fn subscribe_returns_a_400_when_fields_are_present_but_invalid() {
+    // Given
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+    let test_cases = vec![
+        ("name=&email=ursula_le_guin%40gmail.com", "empty name"),
+        ("name=Ursula&email=", "empty email"),
+        ("name=Ursula&email=definitely-not-an-email", "invalid email"),
+    ];
+
+    for (body, description) in test_cases {
+        // When
+        let response = client
+            .post(format!("{}/subscriptions", &app.address))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
+            .send()
+            .await
+            .expect("Failed to execute request.");
+
+        // Then
+        assert_eq!(
+            400,
+            response.status().as_u16(),
+            "The api did not returned 400 Bad Request when the payload was {}.",
+            description
         )
     }
 }
