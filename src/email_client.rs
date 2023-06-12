@@ -1,4 +1,4 @@
-use reqwest::{Client, Url};
+use reqwest::Client;
 use secrecy::{ExposeSecret, Secret};
 use serde::Serialize;
 
