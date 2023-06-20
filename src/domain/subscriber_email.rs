@@ -52,7 +52,7 @@ mod tests {
         }
     }
 
-    // Quickchack calls this method with configurable number of iterations(default = 100)
+    // Quickhack calls this method with configurable number of iterations(default = 100)
     // and on every iteration it genereates new input (if fails it tries to shrink input - not in our case)
     #[quickcheck_macros::quickcheck]
     fn valid_emails_are_parsed_successfully(valid_email: ValidEmailFixture) -> bool {
